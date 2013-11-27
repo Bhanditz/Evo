@@ -7,37 +7,42 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow),
-	game(new Game(ui->centralWidget)) {
+	game(new Game(this, ui->renderArea)) {
 	qDebug() << "MainWindow::MainWindow()";
 
 	ui->setupUi(this);
+	ui->actionRestart->setDisabled(true);
 
 	connect(ui->actionStart, SIGNAL(triggered()), this, SLOT(start()));
 	connect(ui->actionRestart, SIGNAL(triggered()), this, SLOT(restart()));
 	connect(ui->actionAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 	connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
-
-	ui->actionRestart->setDisabled(true);
 }
 
 MainWindow::~MainWindow() {
 	qDebug() << "MainWindow::~MainWindow()";
-	delete game;
+	game->quit();
+	// QThreadPool hoitaa game:n muistista poistamisen
 	delete ui;
 }
 
 void MainWindow::start() {
 	qDebug() << "MainWindow::start()";
-	if (game) QThreadPool::globalInstance()->start(game);
-	ui->actionStart->setDisabled(true);
-	ui->actionRestart->setDisabled(false);
+	if (game) {
+		ui->actionStart->setDisabled(true);
+		ui->actionRestart->setDisabled(false);
+		game->run();
+	} else {
+		qCritical() << "Game not initialized";
+	}
 }
 void MainWindow::restart() {
+	game->quit();
 	delete game;
-	game = new Game();
+	game = new Game(this, ui->renderArea);
+	start();
 }
 
 void MainWindow::about() {
 	qDebug() << "MainWindow::about()";
-
 }

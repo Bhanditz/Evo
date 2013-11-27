@@ -4,18 +4,27 @@
 #include <QtWidgets>
 #include "map.h"
 
-class Game : public QWidget, public QRunnable {
+class Game : public QWidget {
+	Q_OBJECT
+
 	private:
 		Map *map;
 		QMutex mutex;
 		bool keepRunning;
 		QPainter painter;
+		QWidget *renderArea;
+		QTimer *updateTimer;
 	public:
 
-		Game(QWidget *parent = 0) : QWidget(parent), QRunnable() {
+		Game(QWidget *parent, QWidget *renderArea) :
+			QWidget(parent),
+			mutex(QMutex::NonRecursive) {
 			qDebug() << "Game::Game()";
-			map = new Map();
+
+			map         = new Map();
 			keepRunning = true;
+			updateTimer = new QTimer(this);
+			this->renderArea = renderArea;
 		}
 		~Game() {
 			qDebug() << "Game::~Game()";
@@ -23,27 +32,31 @@ class Game : public QWidget, public QRunnable {
 				delete map;
 			}
 		}
+
+	public slots:
 		void run() {
 			qDebug() << "Game::run()";
-			while(keepRunning) {
-				map->update();
-			}
+			connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateEvent()));
+			updateTimer->start(20);
+		}
+		void updateEvent() {
+			qDebug() << "Game::updateEvent()";
+			map->update();
+			this->update();
+
+			if ( keepRunning == false ) updateTimer->stop();
 		}
 		void paintEvent(QPaintEvent *) {
-			qDebug() << "Game::paintEvent()";
+			static int f = 0;
+			f++;
+			qDebug() << QString("Game::paintEvent(): %1").arg(f);
 			painter.begin(this);
-			painter.setFont(QFont("Arial", 30));
-			painter.drawText(rect(), Qt::AlignCenter, "Fooobar");
-			painter.setPen(QPen(Qt::black, 3));
-			for (int j = 0; j < 60; ++j) {
-				if ((j % 5) != 0)
-					painter.drawLine(92, 0, 96, 0);
-				painter.rotate(6.0);
-			}
+			painter.drawText(f%this->width(), f%this->height(), "Foobar");
 			painter.end();
 		}
 		void quit() {
-			this->keepRunning = false;
+			qDebug() << "Game::quit()";
+			updateTimer->stop();
 		}
 };
 

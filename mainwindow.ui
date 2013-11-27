@@ -17,13 +17,13 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QWidget" name="game" native="true">
+   <widget class="QWidget" name="renderArea" native="true">
     <property name="geometry">
      <rect>
-      <x>0</x>
-      <y>0</y>
-      <width>640</width>
-      <height>453</height>
+      <x>30</x>
+      <y>30</y>
+      <width>580</width>
+      <height>393</height>
      </rect>
     </property>
    </widget>
