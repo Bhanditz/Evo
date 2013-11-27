@@ -2,27 +2,28 @@
 #include <QThreadPool>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "game.h"
+#include "game.hpp"
 
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
-	ui(new Ui::MainWindow),
-	game(new Game(this, ui->renderArea)) {
+	ui(new Ui::MainWindow) {
 	qDebug() << "MainWindow::MainWindow()";
 
 	ui->setupUi(this);
 	ui->actionRestart->setDisabled(true);
+	game = new Game(ui->gamewrapper);
 
-	connect(ui->actionStart, SIGNAL(triggered()), this, SLOT(start()));
+
+	connect(ui->actionStart,   SIGNAL(triggered()), this, SLOT(start()));
 	connect(ui->actionRestart, SIGNAL(triggered()), this, SLOT(restart()));
 	connect(ui->actionAboutQt, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
-	connect(ui->actionExit, SIGNAL(triggered()), qApp, SLOT(quit()));
+	connect(ui->actionExit,    SIGNAL(triggered()), qApp, SLOT(quit()));
 }
 
 MainWindow::~MainWindow() {
 	qDebug() << "MainWindow::~MainWindow()";
-	game->quit();
-	// QThreadPool hoitaa game:n muistista poistamisen
+	game->stop();
+	delete game;
 	delete ui;
 }
 
@@ -37,9 +38,9 @@ void MainWindow::start() {
 	}
 }
 void MainWindow::restart() {
-	game->quit();
+	game->stop();
 	delete game;
-	game = new Game(this, ui->renderArea);
+	game = new Game(this);
 	start();
 }
 

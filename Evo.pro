@@ -16,7 +16,7 @@ SOURCES += main.cpp\
         mainwindow.cpp
 
 HEADERS  += mainwindow.h \
-    game.h \
-    map.h
+    game.hpp \
+    map.hpp
 
 FORMS    += mainwindow.ui

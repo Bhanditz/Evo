@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include <QtWidgets>
-#include "map.h"
+#include "map.hpp"
 
 class Game : public QWidget {
 	Q_OBJECT
@@ -14,17 +14,19 @@ class Game : public QWidget {
 		QPainter painter;
 		QWidget *renderArea;
 		QTimer *updateTimer;
+
 	public:
 
-		Game(QWidget *parent, QWidget *renderArea) :
+		Game(QWidget *parent = 0) :
 			QWidget(parent),
-			mutex(QMutex::NonRecursive) {
+			mutex(QMutex::NonRecursive),
+			painter(this) {
 			qDebug() << "Game::Game()";
 
 			map         = new Map();
 			keepRunning = true;
 			updateTimer = new QTimer(this);
-			this->renderArea = renderArea;
+			this->setGeometry(parent->geometry());
 		}
 		~Game() {
 			qDebug() << "Game::~Game()";
@@ -40,22 +42,22 @@ class Game : public QWidget {
 			updateTimer->start(20);
 		}
 		void updateEvent() {
-			qDebug() << "Game::updateEvent()";
 			map->update();
 			this->update();
 
 			if ( keepRunning == false ) updateTimer->stop();
 		}
 		void paintEvent(QPaintEvent *) {
-			static int f = 0;
-			f++;
-			qDebug() << QString("Game::paintEvent(): %1").arg(f);
+			QFont font("Helvetica");
 			painter.begin(this);
-			painter.drawText(f%this->width(), f%this->height(), "Foobar");
+			painter.setFont(font);
+			for(int i = 0; i < 100; i++)
+				painter.drawText(qrand() % this->width(), qrand() % this->height(), "Foobar");
 			painter.end();
 		}
-		void quit() {
-			qDebug() << "Game::quit()";
+		void stop() {
+			qDebug() << "Game::stop()";
+			keepRunning = false;
 			updateTimer->stop();
 		}
 };
