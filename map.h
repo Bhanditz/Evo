@@ -7,6 +7,9 @@ class Map {
 		Map() {
 			qDebug() << "Map::Map()";
 		}
+		~Map() {
+			qDebug() << "Map::~Map()";
+		}
 		void update() {
 
 		}

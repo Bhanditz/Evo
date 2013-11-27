@@ -7,7 +7,7 @@
 MainWindow::MainWindow(QWidget *parent) :
 	QMainWindow(parent),
 	ui(new Ui::MainWindow),
-	game(new Game()) {
+	game(new Game(ui->centralWidget)) {
 	qDebug() << "MainWindow::MainWindow()";
 
 	ui->setupUi(this);
