@@ -17,12 +17,10 @@ class MainWindow : public QMainWindow {
 
 	private slots:
 		void start();
-		void restart();
 		void about();
 
 	private:
 		Ui::MainWindow *ui;
-		Game *game;
 };
 
 #endif // MAINWINDOW_H

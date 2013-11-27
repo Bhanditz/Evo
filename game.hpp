@@ -23,10 +23,10 @@ class Game : public QWidget {
 			painter(this) {
 			qDebug() << "Game::Game()";
 
+			keepRunning = false;
 			map         = new Map();
-			keepRunning = true;
 			updateTimer = new QTimer(this);
-			this->setGeometry(parent->geometry());
+
 		}
 		~Game() {
 			qDebug() << "Game::~Game()";
@@ -40,14 +40,16 @@ class Game : public QWidget {
 			qDebug() << "Game::run()";
 			connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateEvent()));
 			updateTimer->start(20);
+			keepRunning = true;
 		}
 		void updateEvent() {
-			map->update();
-			this->update();
-
-			if ( keepRunning == false ) updateTimer->stop();
+			if (keepRunning) {
+				map->update();
+				this->update();
+			} else updateTimer->stop();
 		}
 		void paintEvent(QPaintEvent *) {
+			if (!keepRunning) return;
 			QFont font("Helvetica");
 			painter.begin(this);
 			painter.setFont(font);
